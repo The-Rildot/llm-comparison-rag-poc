@@ -1,15 +1,11 @@
-from app.rag.retriever import retrieve
-from app.rag.prompt import build_context
-from app.llms.openai_llm import OpenAILLM
+from rag.retriever import retrieve
+from llms.registry import LLM_REGISTRY
 
-question = "Can assets be deleted?"
+question = "What can the admin do that the user cannot?"
 
-chunks = retrieve(question)
-context = build_context(chunks)
+docs = retrieve(question)
+context = "\n\n".join(docs)
 
-llm = OpenAILLM()
-answer = llm.generate(question, context)
-
-print("QUESTION:", question)
-print("\nCONTEXT:\n", context)
-print("\nANSWER:\n", answer)
+for name, llm in LLM_REGISTRY.items():
+    print(f"\n--- {name.upper()} ---")
+    print(llm.generate(question, context))
