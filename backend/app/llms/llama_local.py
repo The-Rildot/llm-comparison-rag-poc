@@ -21,7 +21,7 @@ class LocalLlamaLLM(BaseLLM):
     def __init__(self, model_name: str = "llama3:8b"):
         self.model_name = model_name
 
-    def generate(self, question: str, context: str) -> str:
+    def generate(self, question: str, context: str = "") -> str:
         response = ollama.chat(
             model=self.model_name,
             messages=[

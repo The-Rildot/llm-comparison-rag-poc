@@ -10,7 +10,7 @@ If the answer is not present, say:
 """
 
 class LocalMistralLLM(BaseLLM):
-    def generate(self, question: str, context: str) -> str:
+    def generate(self, question: str, context: str = "") -> str:
         response = ollama.chat(
             model="mistral",
             messages=[

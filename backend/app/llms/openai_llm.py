@@ -15,7 +15,7 @@ class OpenAILLM(BaseLLM):
     def __init__(self):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    def generate(self, question: str, context: str) -> str:
+    def generate(self, question: str, context: str = "") -> str:
         prompt = f"""
 {SYSTEM_PROMPT}
 
