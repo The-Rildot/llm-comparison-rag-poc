@@ -27,33 +27,7 @@ This project demonstrates:
 
 ## System Architecture
 
-┌──────────────────┐
-│   Frontend UI    │
-│ (Streamlit / UI) │
-└────────┬─────────┘
-         │
-         ▼
-┌────────────────────────┐
-│   LLM Comparison API   │
-│ run_llm_comparison()   │
-└────────┬───────────────┘
-         │
-         ▼
-┌────────────────────────────┐
-│ Shared RAG Pipeline        │
-│                            │
-│  • Retriever               │
-│  • Embedding Model         │
-│  • Context Builder         │
-│  • Prompt Template         │
-└────────┬───────────────────┘
-         │
-         ▼
-┌────────────────────────────┐
-│ Vector Database (ChromaDB) │
-│  • Persistent storage      │
-│  • Semantic similarity     │
-└────────────────────────────┘
+![System Architecture](assets/system-architecture.png)
 
 LLMs:
 - Llama 3 (local via Ollama)
@@ -82,34 +56,7 @@ implementing the BaseLLM interface.
 
 ## Project Structure
 
-backend/
-│
-├── app/
-│   ├── llms/                # LLM implementations
-│   │   ├── base.py
-│   │   ├── llama_local.py
-│   │   ├── mistral_local.py
-│   │   └── openai_llm.py
-│   │
-│   ├── rag/
-│   │   ├── ingest.py
-│   │   ├── retriever.py
-│   │   └── chroma_db/
-│   │
-│   ├── services/
-│   │   └── run_comparison.py
-│   │
-│   └── config/
-│       └── settings.py
-│
-frontend/
-│   └── app.py
-│
-data/
-│   └── *.md
-│
-.env
-requirements.txt
+![Project Structure](assets/project-structure.png)
 
 ## Setup Instructions
 
