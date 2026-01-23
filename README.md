@@ -1,8 +1,17 @@
 # LLM Comparison RAG POC
 
 ## Overview
-This project is a proof-of-concept system that compares responses from multiple
-large language models using a shared Retrieval-Augmented Generation (RAG) pipeline.
+
+A production-style Proof of Concept for comparing multiple Large Language Models (LLMs)
+using Retrieval-Augmented Generation (RAG), unified prompts, and real-time performance metrics.
+
+This project allows the same question and documentation context to be evaluated across
+multiple AI models to analyze differences in:
+
+- response quality
+- latency
+- throughput
+- estimated cost
 
 The goal is to demonstrate practical understanding of:
 - modern LLM architectures
@@ -10,6 +19,17 @@ The goal is to demonstrate practical understanding of:
 - prompt orchestration
 - local vs hosted inference
 - model-agnostic system design
+
+## Key Features
+
+- Retrieval-Augmented Generation (RAG) using ChromaDB
+- Multi-model LLM execution with unified prompts
+- Real-time metrics calculation per model
+- Latency measurement (ms)
+- Tokens-per-second throughput analysis
+- Estimated cost calculation for hosted models
+- Visual performance comparison via Streamlit
+- Plug-and-play LLM architecture
 
 ## Internals
 
@@ -42,6 +62,21 @@ LLMs:
 4. Retrieved context is injected into the prompt
 5. The same prompt + context is sent to each LLM
 6. Responses are returned side-by-side for comparison
+
+## Metrics Collected
+
+For every model invocation, the system calculates:
+
+| Metric | Description |
+|------|------|
+| Latency (ms) | End-to-end response time |
+| Token Count | Approximate generated tokens |
+| Tokens/sec | Throughput performance |
+| Response Length | Character count |
+| Estimated Cost | Based on provider pricing |
+
+Metrics are calculated consistently across all models
+using the same prompt and retrieved context.
 
 ## Supported Models
 
@@ -91,7 +126,8 @@ streamlit run frontend/app.py
 
 ### Application Demo
 
-![LLM Comparison UI](assets/ui-demo.png)
+![LLM Comparison UI 1](assets/ui-demo-1.png)
+![LLM Comparison UI 2](assets/ui-demo-2.png)
 
 ## Design Decisions
 
@@ -128,7 +164,6 @@ streamlit run frontend/app.py
 - Hybrid search (BM25 + vectors)
 - Streaming token output
 - LLM evaluation harness
-- Response latency comparison
 - Frontend in React + Tailwind
 - Claude integration
 
@@ -142,4 +177,3 @@ streamlit run frontend/app.py
 - Local & hosted inference
 - Environment configuration
 - Modular system design
-
