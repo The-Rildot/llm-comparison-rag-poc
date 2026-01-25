@@ -1,3 +1,5 @@
+import statistics
+
 def calculate_metrics(
     response: str,
     latency_ms: float,
@@ -21,4 +23,15 @@ def calculate_metrics(
         "tokens_per_second": tps,
         "response_chars": len(response),
         "estimated_cost_usd": cost
+    }
+
+def calculate_latency_percentiles(latencies: list[float]):
+    latencies.sort()
+
+    return {
+        "p50_ms": round(statistics.median(latencies), 2),
+        "p95_ms": round(
+            statistics.quantiles(latencies, n=100)[94],
+            2
+        )
     }

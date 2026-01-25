@@ -30,6 +30,9 @@ The goal is to demonstrate practical understanding of:
 - Estimated cost calculation for hosted models
 - Visual performance comparison via Streamlit
 - Plug-and-play LLM architecture
+- Evaluation Harness
+- Streaming Token Output
+- Interactive Dashboard
 
 ## Internals
 
@@ -49,19 +52,26 @@ This project demonstrates:
 
 ![System Architecture](assets/system-architecture.png)
 
-LLMs:
-- Llama 3 (local via Ollama)
-- Mistral (local via Ollama)
-- GPT (OpenAI API)
+## Supported Models
+
+| Model         | Type  | Provider |
+| ------------- | ----- | -------- |
+| Llama 3 8B    | Local | Ollama   |
+| Mistral       | Local | Ollama   |
+| GPT-4 / GPT-5 | API   | OpenAI   |
+
+The system is model-agnostic — new LLMs can be added by
+implementing the BaseLLM interface.
 
 ## RAG Flow 
 
 1. User submits a question
-2. Question is embedded using sentence-transformers
-3. Top-K relevant chunks are retrieved from ChromaDB
-4. Retrieved context is injected into the prompt
-5. The same prompt + context is sent to each LLM
-6. Responses are returned side-by-side for comparison
+2. Question is embedded locally
+3. Relevant documents are retrieved from ChromaDB
+4. Retrieved context is injected into a unified prompt
+5. The same prompt is executed across all models
+6. Metrics are collected per run
+7. Results are visualized in the frontend
 
 ## Metrics Collected
 
@@ -78,16 +88,22 @@ For every model invocation, the system calculates:
 Metrics are calculated consistently across all models
 using the same prompt and retrieved context.
 
-## Supported Models
+### Per Execution
 
-| Model         | Type  | Provider |
-| ------------- | ----- | -------- |
-| Llama 3 8B    | Local | Ollama   |
-| Mistral       | Local | Ollama   |
-| GPT-4 / GPT-5 | API   | OpenAI   |
+- Latency (ms)
+- Token count (approximation)
+- Tokens per second
+- Response length
+- Estimated API cost
 
-The system is model-agnostic — new LLMs can be added by
-implementing the BaseLLM interface.
+### Multi-Run Evaluation
+- Average latency
+- p50 latency
+- p95 latency
+- Failure rate detection
+- Stable statistical comparison
+
+These metrics allow realistic benchmarking beyond single-response testing.
 
 ## Project Structure
 
@@ -128,6 +144,7 @@ streamlit run frontend/app.py
 
 ![LLM Comparison UI 1](assets/ui-demo-1.png)
 ![LLM Comparison UI 2](assets/ui-demo-2.png)
+![LLM Comparison UI 3](assets/ui-demo-3.png)
 
 ## Design Decisions
 
@@ -150,13 +167,23 @@ streamlit run frontend/app.py
 - Allows drop-in replacement of providers
 - Mirrors production AI architecture
 
-## Limitations
+## Why an evaluation harness?
+- Single responses are noisy
+- Percentile metrics reflect real production behavior
+- Enables fair model comparison
 
-- No streaming responses yet
-- No reranking layer
-- No evaluation metrics
-- Basic prompt formatting
-- Single-vector retrieval only
+## Why streaming support?
+- Improves UX
+- Reduces perceived latency
+- Mirrors production chat systems
+
+## Known Limitations
+
+- No reranking layer (cross-encoder)
+- No hybrid search (BM25 + vectors)
+- No automated evaluation datasets
+- Streamlit frontend only
+- No persistence of evaluation history
 
 ## Future Improvements
 
@@ -177,3 +204,20 @@ streamlit run frontend/app.py
 - Local & hosted inference
 - Environment configuration
 - Modular system design
+- Streaming inference
+- Model evaluation & benchmarking
+- Latency percentile analysis
+- Fault-tolerant AI systems
+- Frontend observability dashboards
+- Production-style AI design patterns
+
+## Final Notes
+
+This project was intentionally designed to resemble how real-world AI platforms are structured:
+- clean separation of concerns
+- provider-agnostic model interfaces
+- observable performance metrics
+- reproducible evaluation methodology
+
+It is not a demo of a single model —
+it is a framework for understanding and comparing them.

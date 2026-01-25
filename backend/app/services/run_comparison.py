@@ -2,88 +2,49 @@ from backend.app.llms.llama_local import LocalLlamaLLM
 from backend.app.llms.mistral_local import LocalMistralLLM
 from backend.app.llms.openai_llm import OpenAILLM
 from backend.app.rag.retriever import retrieve
-from backend.app.services.metrics import calculate_metrics
-import time
+
+from backend.app.services.evaluation_harness import (
+    run_model,
+    run_model_multiple_times
+)
 
 llama = LocalLlamaLLM()
 mistral = LocalMistralLLM()
 gpt = OpenAILLM()
 
 
-def run_llm_comparison(question: str):
-
-    # ------------------------
-    # RAG retrieval
-    # ------------------------
+def run_llm_comparison(
+    question: str,
+    mode: str = "single",     # "single" | "multiple"
+    stream: bool = False
+):
     context_chunks = retrieve(question)
     context = "\n".join(context_chunks)
 
-    prompt = f"""
-You are an assistant answering questions using the following documentation.
-
-Context:
-{context}
-
-Question:
-{question}
-
-Answer clearly and concisely.
-"""
+    models = {
+        "Llama 3": llama,
+        "Mistral": mistral,
+        "GPT": gpt
+    }
 
     results = {}
 
-    # ========================
-    # Llama
-    # ========================
-    start = time.perf_counter()
-    llama_response = llama.generate(prompt)
-    end = time.perf_counter()
+    for name, model in models.items():
 
-    llama_latency = (end - start) * 1000
+        if mode == "multiple":
+            results[name] = run_model_multiple_times(
+                model=model,
+                question=question,
+                context=context,
+                runs=5
+            )
 
-    results["Llama 3"] = {
-        "response": llama_response,
-        "metrics": calculate_metrics(
-            response=llama_response,
-            latency_ms=llama_latency,
-            model_key="llama"
-        )
-    }
-
-    # ========================
-    # Mistral
-    # ========================
-    start = time.perf_counter()
-    mistral_response = mistral.generate(prompt)
-    end = time.perf_counter()
-
-    mistral_latency = (end - start) * 1000
-
-    results["Mistral"] = {
-        "response": mistral_response,
-        "metrics": calculate_metrics(
-            response=mistral_response,
-            latency_ms=mistral_latency,
-            model_key="mistral"
-        )
-    }
-
-    # ========================
-    # GPT
-    # ========================
-    start = time.perf_counter()
-    gpt_response = gpt.generate(prompt)
-    end = time.perf_counter()
-
-    gpt_latency = (end - start) * 1000
-
-    results["GPT"] = {
-        "response": gpt_response,
-        "metrics": calculate_metrics(
-            response=gpt_response,
-            latency_ms=gpt_latency,
-            model_key="gpt"
-        )
-    }
+        else:
+            results[name] = run_model(
+                model=model,
+                question=question,
+                context=context,
+                stream=stream
+            )
 
     return results
